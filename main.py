@@ -6,29 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import imutils
-
-# plt.style.use("ggplot")
-# get_ipython().run_line_magic('matplotlib', 'inline')
-
-from tqdm import tqdm_notebook, tnrange
-from itertools import chain
-from skimage.io import imread, imshow, concatenate_images
 from skimage.transform import resize
-from skimage.morphology import label
-from sklearn.model_selection import train_test_split
-
-import tensorflow as tf
-
-from keras.models import Model, load_model
-from keras.layers import Input, BatchNormalization, Activation, Dense, Dropout
-from keras.layers.core import Lambda, RepeatVector, Reshape
-from keras.layers.convolutional import Conv2D, Conv2DTranspose
-from keras.layers.pooling import MaxPooling2D, GlobalMaxPool2D
-from keras.layers.merge import concatenate, add
-from keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
-from keras.optimizers import Adam
-from keras import regularizers
-from keras_unet.metrics import iou, iou_thresholded, dice_coef
+from skimage.util import img_as_ubyte
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from segmentor import FootpathSegmentor
 from object_detector import ObjectDetector
@@ -61,8 +40,8 @@ def generate_output_frame(frame, video=False):
 
     if video:
         frame = imutils.rotate(frame, 270)  # Frame gets auto rotated, should be changed as per need
-
-    frame = resize(frame, (256, 256, 3), mode='constant', preserve_range=False)
+        frame =  img_as_ubyte(resize(frame, (256, 256, 3), mode='constant', preserve_range=False)) #img_as_ubyte to keep it np.uint8
+        # print(frame.dtype, "XXX")
 
     segmentation_frame = frame.copy()
     detection_frame = frame.copy()
@@ -86,10 +65,13 @@ def generate_output_frame(frame, video=False):
 
 
 # In[3]
-image_data = cv2.imread('test/data (3).jpg')
+# image_data = cv2.imread('test/data (3).jpg')
+image_data = plt.imread('test/data (3).jpg')
+print("Original: ", image_data.dtype)
 # image_data = imutils.rotate(img_to_array(image_data), 270)
 # print(type(img_to_array(image_data)))
-plt.imshow(array_to_img(image_data))
+# image_data = cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
+plt.imshow(image_data)
 plt.show()
 
 binary_mask = model.inference(image_data)
@@ -97,21 +79,12 @@ plt.imshow(binary_mask)
 plt.show()
 
 dat = image_data
+
 final_out = generate_output_frame(dat)
-plt.imshow(final_out)
+print("Final: ", final_out.dtype)
+plt.imshow(final_out.astype(np.uint8))
+plt.imsave("test_img.jpg", final_out)
 plt.show()
-
-# In[ ]:
-
-
-# # Video
-
-# In[16]:
-
-
-from PIL import Image
-
-import numpy as np
 
 # In[17]:
 
@@ -140,7 +113,10 @@ while (cap.isOpened()):
 
             #             frame_to_show = generate_output_frame(frame, video=True)
             #             frame_to_show = object_detection(frame.copy(), net)
+            # frame = imutils.resize(frame, 256, 256)
             frame_to_show = generate_output_frame(frame, video=True)
+            # plt.imshow(frame_to_show)
+            # plt.show()
 
             cv2.imshow('aEye', frame_to_show)
         else:
