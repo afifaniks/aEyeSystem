@@ -1,24 +1,25 @@
 # In[1]
-import os
-import random
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 import imutils
 from skimage.transform import resize
 from skimage.util import img_as_ubyte
-from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras.preprocessing.image import array_to_img
 from segmentor import FootpathSegmentor
 from object_detector import ObjectDetector
 from visualizer import Visualizer
 from dist_calculator import DistanceCalculator
+from guide import Guide
 
+
+# In[]
 # load the best model
 model = FootpathSegmentor(weight_path='weights/footpath_6k_blur.h5')
 detector = ObjectDetector("weights/yolov3.weights", "cfg/yolov3.cfg")
 dist_calc = DistanceCalculator("weights/distance_model.pkl")
 visualizer = Visualizer()
+guide = Guide()
 
 
 # In[2]
@@ -65,12 +66,7 @@ def generate_output_frame(frame, video=False):
 
 
 # In[3]
-# image_data = cv2.imread('test/data (3).jpg')
-image_data = plt.imread('test/data (3).jpg')
-print("Original: ", image_data.dtype)
-# image_data = imutils.rotate(img_to_array(image_data), 270)
-# print(type(img_to_array(image_data)))
-# image_data = cv2.cvtColor(image_data, cv2.COLOR_RGB2BGR)
+image_data = plt.imread('test/474.jpg')
 plt.imshow(image_data)
 plt.show()
 
@@ -81,10 +77,16 @@ plt.show()
 dat = image_data
 
 final_out = generate_output_frame(dat)
-print("Final: ", final_out.dtype)
-plt.imshow(final_out.astype(np.uint8))
-plt.imsave("test_img.jpg", final_out)
+plt.imshow(final_out)
 plt.show()
+res = guide.guide_safe_path(final_out)
+
+if res == 0:
+    print("Go Straight")
+elif res == 1:
+    print("Go Left")
+elif res == 2:
+    print("Go Right")
 
 # In[17]:
 
@@ -115,8 +117,14 @@ while (cap.isOpened()):
             #             frame_to_show = object_detection(frame.copy(), net)
             # frame = imutils.resize(frame, 256, 256)
             frame_to_show = generate_output_frame(frame, video=True)
-            # plt.imshow(frame_to_show)
-            # plt.show()
+            res = guide.guide_safe_path(frame_to_show.copy())
+
+            if res == 0:
+                print("Go Straight")
+            elif res == 1:
+                print("Go Left")
+            elif res == 2:
+                print("Go Right")
 
             cv2.imshow('aEye', frame_to_show)
         else:

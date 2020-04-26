@@ -3,7 +3,9 @@ import pickle
 
 class DistanceCalculator:
     def __init__(self, weight_path):
-        # load
+        """
+        :param weight_path: sklearn model saved in pickle (.pkl) format path.
+        """
         with open(weight_path, 'rb') as file:
             self.dist_model = pickle.load(file)
 

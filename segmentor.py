@@ -1,11 +1,11 @@
-from keras.models import Model, load_model
+from keras.models import Model
 from keras.layers import Input, BatchNormalization, Activation, Dropout
 from keras.layers.convolutional import Conv2D, Conv2DTranspose
 from keras.layers.pooling import MaxPooling2D
 from keras.layers.merge import concatenate
 from keras.optimizers import Adam
 from keras_unet.metrics import iou, iou_thresholded, dice_coef
-from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras.preprocessing.image import img_to_array
 from skimage.transform import resize
 
 
@@ -18,7 +18,6 @@ class FootpathSegmentor:
         self.model.load_weights(weight_path)
 
     def inference(self, frame):
-        #     print(test_imagex.shape)
         temp_img = img_to_array(frame)
         temp_img = resize(temp_img, (256, 256, 1), mode='constant', preserve_range=True)
         temp_img /= 255
