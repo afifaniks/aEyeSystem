@@ -66,7 +66,7 @@ def generate_output_frame(frame, video=False):
 
 
 # In[3]
-image_data = plt.imread('test/474.jpg')
+image_data = plt.imread('test/130.jpg')
 plt.imshow(image_data)
 plt.show()
 
@@ -77,20 +77,28 @@ plt.show()
 dat = image_data
 
 final_out = generate_output_frame(dat)
-plt.imshow(final_out)
-plt.show()
-res = guide.guide_safe_path(final_out)
+res = guide.guide_safe_path(final_out.copy())
+
+text = ""
 
 if res == 0:
-    print("Go Straight")
+    text = "Go Straight"
 elif res == 1:
-    print("Go Left")
+    text = "Go Left"
 elif res == 2:
-    print("Go Right")
+    text = "Go Right"
+
+cv2.fillPoly(final_out, np.array([[[85, 0], [85, 30], [170, 30], [170, 0]]]), color=(0, 0, 0))
+cv2.putText(final_out,
+            text,
+            (90, 20),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+            (255, 255, 255),
+            2)
+plt.imshow(final_out)
+plt.show()
 
 # In[17]:
-
-
 cap = cv2.VideoCapture('test/sample2.mp4')
 fps = int(cap.get(cv2.CAP_PROP_FPS))
 print(fps)
