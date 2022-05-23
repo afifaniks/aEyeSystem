@@ -66,7 +66,7 @@ def generate_output_frame(frame, video=False):
 
 
 # In[3]
-image_data = plt.imread('test/130.jpg')
+image_data = plt.imread('test/data (1).jpg')
 plt.imshow(image_data)
 plt.show()
 
