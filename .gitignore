@@ -1,3 +1,4 @@
 test/*
-weights/yolov3-tiny.weights
-weights/yolov3.weights
+weights/*
+.idea/
+venv/
